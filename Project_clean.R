@@ -1,12 +1,36 @@
 # Read Data set
 framinghamdata <- read.csv("framingham.csv")
 
+# Install if necessary
+
+# install.packages("tidyverse")
+# install.packages("summarytools")
+# install.packages("corrplot")
+# install.packages("ggplot2")
+# install.packages("dplyr")
+# install.packages("cluster")
+# install.packages("factoextra")
+# install.packages("rpart")
+# install.packages("ROSE")
+# install.packages("class")
+# install.packages("rpart.plot")
+# install.packages("randomForest")
+# install.packages("caret")
+
 # Libraries
 library(tidyverse)
 library(summarytools)
 library(corrplot)
 library(ggplot2)
 library(dplyr)
+library(cluster)
+library(factoextra)
+library(rpart)
+library(ROSE)
+library(class)
+library(rpart.plot)
+library(randomForest)
+library(caret)
 
 ######### Data Exploration #########
 
@@ -150,8 +174,7 @@ print(df_pca)
 # ----------
 
 ############# Clustering ############
-library(cluster)
-library(factoextra)
+
 
 set.seed(42)
 
@@ -161,7 +184,7 @@ clusters3 <- kmeans(df_pca, centers = 2, nstart = 25)
 print(clusters3)
 
 ############# Classification ############
-library(rpart)
+
 
 n <- nrow(framinghamdata_scale)
 set.seed(42)
@@ -171,7 +194,7 @@ framinghamdata_scale.test <- framinghamdata_scale[-train, ]
 
 dim(framinghamdata_scale)
 # Oversampling the minority class
-library(ROSE)
+
 set.seed(42)
 balanced_data <- ovun.sample(TenYearCHD ~ ., data = framinghamdata_scale.train, method = "over", N = 2 * table(framinghamdata_scale.train$TenYearCHD)[1])$data
 
@@ -195,7 +218,6 @@ print(confusion_matrix_logit)
 
 # 2. KNN
 
-library(class)
 
 # 2.1 Selecting numerical features
 train.knn <- balanced_data[, c("age", "cigsPerDay", "totChol", "sysBP", "diaBP", "BMI", "heartRate", "glucose")]
@@ -228,11 +250,8 @@ print(accuracy_k1)
 
 
 # 3. Decision tress
-library(rpart)
-library(rpart.plot)
 
 # 3.1 Using pre-scaled dataset
-library(rpart)
 
 n <- nrow(framinghamdata)
 set.seed(42)
@@ -243,7 +262,6 @@ framinghamdata.test <- framinghamdata[-train, ]
 dim(framinghamdata)
 
 # Oversampling the minority class
-library(ROSE)
 set.seed(42)
 balanced_data_no_scale <- ovun.sample(TenYearCHD ~ ., data = framinghamdata.train, method = "over", N = 2 * table(framinghamdata.train$TenYearCHD)[1])$data
 
@@ -272,8 +290,6 @@ print(accuracy_tree)
 
 # 4. Random Forest
 
-
-library(randomForest)
 set.seed(42)
 rf.model <- randomForest(TenYearCHD ~ ., data = balanced_data_no_scale, 
   ntree = 500, mtry = 4, importance = TRUE)
@@ -303,8 +319,6 @@ comparison_table <- data.frame(
 )
 
 print(comparison_table)
-
-library(caret)
 
 # 1. Logistic Regression Confusion Matrix
 confusion_matrix_logit <- confusionMatrix(as.factor(logit.pred), framinghamdata_scale.test$TenYearCHD, positive = "1")
